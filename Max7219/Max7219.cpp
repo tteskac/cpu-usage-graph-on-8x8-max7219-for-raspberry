@@ -25,8 +25,6 @@ Max7219::Max7219(unsigned char dataPin, unsigned char clockPin,  unsigned char l
     
     // Clear display.
     this->Clear();
-
-    printf ("Raspberry Pi Max7219 Matrix Display using WiringPi initialized!\n");
 }
 
 // Take a reg numer and data and send to the max7219.

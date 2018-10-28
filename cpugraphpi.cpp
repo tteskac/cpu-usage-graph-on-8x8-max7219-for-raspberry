@@ -6,6 +6,7 @@
 
 #include <unistd.h>
 #include <cstring>
+#include <math.h>       /* pow */
 
 #include <iostream>
 using namespace std;
@@ -15,20 +16,22 @@ using namespace std;
 void initialise();
 void update();
 int get_cpu_usage();
+void shift(int newValue);
+void updateDisplay();
+int map(int x, int in_min, int in_max, int out_min, int out_max);
+
+// Init matrix display on pins:
+// DATA/DIN:    0 - GPIO 17 (WiringPi pin num 0) header pin 11
+// CLOCK/CLK:   3 - GPIO 22 (WiringPi pin num 3) header pin 15
+// LOAD/CS:     4 - GPIO 23 (WiringPi pin num 4) header pin 16
+Max7219 display(0,3,4); 
 
 int main(int argc, char* argv[]) {
 
 	initialise();
     
-    // Init matrix display on pins:
-    // DATA/DIN:    0 - GPIO 17 (WiringPi pin num 0) header pin 11
-    // CLOCK/CLK:   3 - GPIO 22 (WiringPi pin num 3) header pin 15
-    // LOAD/CS:     4 - GPIO 23 (WiringPi pin num 4) header pin 16
-    Max7219 display(0,3,4); 
     display.SetBrightness(0); // valid 0-15
-    // For testing set one pixel on line 5 column 5 (1,2,4,8,>16<,32,64,128).
-    display.Send(5, 16);
-
+    //display.Send(1, 1);
 
 	if (argc < 2)
 	{
@@ -38,21 +41,41 @@ int main(int argc, char* argv[]) {
 
 	int x = atoi(argv[1]);
 
-	pinMode(7, OUTPUT);
 	while(1) {
 		int cpu_usage = get_cpu_usage();
-		cout << cpu_usage << endl;
-		digitalWrite(7,1);
-		delay(5);
-		digitalWrite(7, 0);
-		delay(x);		   
+		//cout << "CPU: " << cpu_usage << "%" << endl;
+        shift(cpu_usage);
+        updateDisplay();
+        delay(x);
 	}	      
 	
 	return 0 ;
 }
 
 
+int history[8] = {0,0,0,0,0,0,0,0};
+void shift(int newValue)
+{
+    for (int i=0; i<7; i++)
+    {
+        history[i] = history[i+1];
+    }
+    history[7] = map(newValue, 0, 100, 0, 9);
+}
 
+void updateDisplay()
+{
+    for (int i=0; i<8; i++)
+    {
+        display.Send(i+1, pow(2, history[i])-1);
+    }
+}
+
+// Helper
+int map(int x, int in_min, int in_max, int out_min, int out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 
 
@@ -84,8 +107,6 @@ void initialise()
     //     pinMode(i, OUTPUT);
     //     digitalWrite(i, 0);
     // }
-
-    printf("Done\n");
 }
 
 // void update()
