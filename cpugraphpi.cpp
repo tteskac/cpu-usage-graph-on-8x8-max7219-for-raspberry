@@ -10,6 +10,8 @@
 #include <iostream>
 using namespace std;
 
+#include "Max7219.h"
+
 void initialise();
 void update();
 int get_cpu_usage();
@@ -17,10 +19,20 @@ int get_cpu_usage();
 int main(int argc, char* argv[]) {
 
 	initialise();
+    
+    // Init matrix display on pins:
+    // DATA/DIN:    0 - GPIO 17 (WiringPi pin num 0) header pin 11
+    // CLOCK/CLK:   3 - GPIO 22 (WiringPi pin num 3) header pin 15
+    // LOAD/CS:     4 - GPIO 23 (WiringPi pin num 4) header pin 16
+    Max7219 display(0,3,4); 
+    display.SetBrightness(0); // valid 0-15
+    // For testing set one pixel on line 5 column 5 (1,2,4,8,>16<,32,64,128).
+    display.Send(5, 16);
+
 
 	if (argc < 2)
 	{
-		cout << "ERROR: Enter delay." << endl;
+		cout << "ERROR: Enter delay, e.g. 500 for 500ms" << endl;
 	    return 1;
 	}
 
