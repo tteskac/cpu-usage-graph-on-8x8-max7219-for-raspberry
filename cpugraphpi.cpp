@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace std;
 
-#include "Max7219.h"
+#include "Max7219/Max7219.h"
 
 void initialise();
 void update();

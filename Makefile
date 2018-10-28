@@ -12,7 +12,7 @@ TARGET = cpugraphpi
 all: $(TARGET)
 
 $(TARGET): $(TARGET).cpp
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).cpp Max7219.cpp -lwiringPi
+	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).cpp Max7219/Max7219.cpp -lwiringPi
 
 clean:
 	$(RM) $(TARGET)
